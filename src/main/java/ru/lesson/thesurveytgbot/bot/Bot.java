@@ -47,7 +47,9 @@ public class Bot extends TelegramLongPollingBot {
         String getMessage = update.getMessage().getText();
 
         Optional<User> userOptional = userRepository.findByChatId(chatId);
-
+        if(getMessage.contains("/start")||getMessage.contains("/report")) {
+            userStates.remove(chatId);
+        }
 
         if (getMessage.contains("/report")) {
             try {
