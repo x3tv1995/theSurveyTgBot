@@ -28,6 +28,9 @@ public class Bot extends TelegramLongPollingBot {
     @Autowired
     private Document document;
 
+    @Autowired
+    private  ProcessAwaiting processAwaiting;
+
     public Bot(@Value("${bot.token}") String token, UserRepository userRepository) {
         super(token);
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -66,11 +69,11 @@ public class Bot extends TelegramLongPollingBot {
             message(chatId, "Введите ваше имя");
             userStates.put(chatId, UserState.AWAITING_NAME);
         } else if (userStates.get(chatId) != null && userStates.get(chatId).equals(UserState.AWAITING_NAME)) {
-            processAwaitingName(chatId, getMessage, user);
+            processAwaiting.processAwaitingName(chatId, getMessage, user,userStates,this);
         } else if (userStates.get(chatId) != null && userStates.get(chatId).equals(UserState.AWAITING_EMAIL)) {
-            processAwaitingEmail(chatId, getMessage, user);
+            processAwaiting.processAwaitingEmail(chatId, getMessage, user,userStates,this);
         } else if (userStates.get(chatId) != null && userStates.get(chatId).equals(UserState.AWAITING_RATING)) {
-            processAwaitingRating(chatId, getMessage, user);
+            processAwaiting.processAwaitingRating(chatId, getMessage, user,userStates,this);
 
         }
 
@@ -99,47 +102,7 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    public void processAwaitingName(long chatId, String getMessage, User user) {
-        user.setFirstName(getMessage);
-        if (validateUserProperty(user, "firstName")) {
-            message(chatId, "Принято");
-            message(chatId, "Введите ваше почту");
-            userStates.put(chatId, UserState.AWAITING_EMAIL);
-            userRepository.save(user);
-        } else {
-            message(chatId, "Попробуйте ещё раз ввести  " + "имя");
-        }
 
-    }
-
-    public void processAwaitingEmail(long chatId, String getMessage, User user) {
-        user.setEmail(getMessage);
-        if (validateUserProperty(user, "email")) {
-            message(chatId, "Принято");
-            message(chatId, "Введите ваше оценку от 1 до 10");
-            userStates.put(chatId, UserState.AWAITING_RATING);
-            userRepository.save(user);
-        } else {
-            message(chatId, "Попробуйте ещё раз ввести  " + "email");
-        }
-    }
-
-    public void processAwaitingRating(long chatId, String getMessage, User user) {
-        try {
-            user.setRating(Integer.parseInt(getMessage));
-            if (validateUserProperty(user, "rating")) {
-                message(chatId, "Принято");
-                userStates.remove(chatId);
-                userRepository.save(user);
-            } else {
-                message(chatId, "Попробуйте ещё раз ввести  " + "оценку");
-            }
-        } catch (NumberFormatException e) {
-            message(chatId, "Попробуйте ещё раз ввести  " + "оценку");
-        }
-
-
-    }
 
 
 }
