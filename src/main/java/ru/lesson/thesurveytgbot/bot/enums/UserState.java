@@ -1,4 +1,4 @@
-package ru.lesson.thesurveytgbot.bot;
+package ru.lesson.thesurveytgbot.bot.enums;
 
 public enum UserState {
     AWAITING_NAME,

@@ -1,12 +1,16 @@
-package ru.lesson.thesurveytgbot.bot;
+package ru.lesson.thesurveytgbot.bot.service;
 
 import org.springframework.stereotype.Component;
+import ru.lesson.thesurveytgbot.bot.Bot;
+import ru.lesson.thesurveytgbot.bot.Process;
+import ru.lesson.thesurveytgbot.bot.enums.UserState;
 import ru.lesson.thesurveytgbot.entity.User;
 import ru.lesson.thesurveytgbot.repository.UserRepository;
+
 import java.util.Map;
 
 @Component
-public class ProcessAwaiting {
+public class ProcessAwaiting implements Process {
     private final UserRepository userRepository;
 
 
@@ -14,7 +18,8 @@ public class ProcessAwaiting {
         this.userRepository = userRepository;
     }
 
-    public void processAwaitingName(long chatId, String getMessage, User user, Map<Long, UserState> userStates,Bot bot) {
+    @Override
+    public void processAwaitingName(long chatId, String getMessage, User user, Map<Long, UserState> userStates, Bot bot) {
         user.setFirstName(getMessage);
         if (bot.validateUserProperty(user, "firstName")) {
             bot.message(chatId, "Принято");
@@ -27,7 +32,8 @@ public class ProcessAwaiting {
 
     }
 
-    public void processAwaitingEmail(long chatId, String getMessage, User user,Map<Long, UserState> userStates,Bot bot) {
+    @Override
+    public void processAwaitingEmail(long chatId, String getMessage, User user, Map<Long, UserState> userStates, Bot bot) {
         user.setEmail(getMessage);
         if (bot.validateUserProperty(user, "email")) {
             bot.message(chatId, "Принято");
@@ -39,7 +45,8 @@ public class ProcessAwaiting {
         }
     }
 
-    public void processAwaitingRating(long chatId, String getMessage, User user,Map<Long, UserState> userStates,Bot bot) {
+    @Override
+    public void processAwaitingRating(long chatId, String getMessage, User user, Map<Long, UserState> userStates, Bot bot) {
         try {
             user.setRating(Integer.parseInt(getMessage));
             if (bot.validateUserProperty(user, "rating")) {
@@ -52,7 +59,6 @@ public class ProcessAwaiting {
         } catch (NumberFormatException e) {
             bot.message(chatId, "Попробуйте ещё раз ввести  " + "оценку");
         }
-
 
     }
 }

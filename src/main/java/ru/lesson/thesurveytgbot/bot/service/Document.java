@@ -1,5 +1,6 @@
-package ru.lesson.thesurveytgbot.bot;
+package ru.lesson.thesurveytgbot.bot.service;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.lesson.thesurveytgbot.bot.Bot;
 import ru.lesson.thesurveytgbot.entity.User;
 import ru.lesson.thesurveytgbot.repository.UserRepository;
 
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
+@Log4j2
 public class Document {
     private final UserRepository userRepository;
 
@@ -53,6 +56,7 @@ public class Document {
             document.close();
             sendDocument(chatId, reportBytes, bot);
         } catch (IOException e) {
+          log.error("Ошибка "+e.getMessage());
             e.printStackTrace();
         }
     }
@@ -69,11 +73,13 @@ public class Document {
             try {
                 bot.execute(sendDocument);
             } catch (TelegramApiException e) {
+                log.error("Ошибка "+e.getMessage());
                 e.printStackTrace();
             } finally {
                 tempFile.delete();
             }
         } catch (IOException e) {
+            log.error("Ошибка "+e.getMessage());
             e.printStackTrace();
         }
     }
